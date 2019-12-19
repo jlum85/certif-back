@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const middlewares = require("./middlewares");
-
+const mailgun = require("mailgun-js");
 const Devis = require("../models/Devis");
 
 const getRandomDossier = () => {
@@ -9,8 +9,71 @@ const getRandomDossier = () => {
   return Math.floor(Math.random() * 100000000);
 };
 
+const sendMail = async newDevis => {
+  const to = newDevis.mail;
+  const subject = "Devis meilleurtaux.com";
+
+  const radioOption1 = ["MAISON", "APPARTEMENT"];
+  const radioOption2 = ["ANCIEN", "NEUF"];
+  const radioOption3 = [
+    "Résidence principale",
+    "Résidence secondaire",
+    "Investissement locatif"
+  ];
+  const radioOption4 = [
+    "Locataire",
+    "Propriétaire",
+    "Bénéficiaire d'un logement de fonction",
+    "Hébergé à titre gratuit"
+  ];
+
+  const text = ` Bonjour
+
+  Votre devis ${newDevis.dossierNumber} a bien été enregistré.
+
+  Récapitulatif de la demande : 
+  - Type de bien : ${radioOption1[newDevis.propertyType]}
+  - Etat du bien : ${radioOption2[newDevis.propertyState]}
+  - Usage du bien : ${radioOption3[newDevis.propertyUse]}
+
+  - Votre situation actuelle : ${radioOption4[newDevis.propertySituation]}
+
+  Localisation du bien à financer : 
+  - Pays : ${newDevis.country}
+  - Ville : ${newDevis.city}
+
+  - Montant estimé de votre acquisition : ${newDevis.acquisitionAmount}
+  - Montant estimé des travaux : ${newDevis.workingAmount}
+  - Frais de notaire : ${newDevis.notaryFees}
+  - Budget total estimé du projet : ${newDevis.totalBudget}
+
+
+  Cordialement
+
+  meilleurtaux.com `;
+
+  const mg = mailgun({
+    apiKey: process.env.MAILGUN_API_KEY,
+    domain: process.env.MAILGUN_DOMAINE
+  });
+  const data = {
+    from: "meilleurTaux  <postmaster@" + process.env.MAILGUN_DOMAINE + ">",
+    to: to,
+    subject: subject,
+    text: text
+  };
+
+  try {
+    mg.messages().send(data, (error, body) => {
+      console.log(body);
+    });
+  } catch (error) {
+    console.log("An error occured while sending mail");
+  }
+};
+
 // POST  /create
-router.post("/devis/create", middlewares.authenticate, async (req, res) => {
+router.post("/devis/create", async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
   // destructuring pour récupérer les paramètres
@@ -63,7 +126,8 @@ router.post("/devis/create", middlewares.authenticate, async (req, res) => {
     newDevis.totalBudget = acquisitionAmount + workingAmount + notaryFees;
     newDevis.dossierNumber = getRandomDossier();
 
-    await newDevis.save();
+    await newDevis.save(); // sauvegarde en base
+    await sendMail(newDevis); // mail de récapitulatif
 
     res.json(newDevis);
   } catch (error) {
@@ -71,7 +135,7 @@ router.post("/devis/create", middlewares.authenticate, async (req, res) => {
   }
 });
 
-// POST   /delete
+// POST   /delete ,  on utilise un midddleware car seul l'admin peut supprimmer
 router.post("/devis/delete/:id", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
@@ -94,7 +158,7 @@ router.post("/devis/delete/:id", middlewares.authenticate, async (req, res) => {
   }
 });
 
-// GET  Liste des devis
+// GET  Liste des devis , on utilise un midddleware car seul l'admin peut consulter
 router.get("/devis", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
@@ -106,7 +170,7 @@ router.get("/devis", middlewares.authenticate, async (req, res) => {
   }
 });
 
-// GET   Sélection d'un devis par son n° de dossier
+// GET   Sélection d'un devis par son n° de dossier , on utilise un midddleware car seul l'admin peut consulter
 router.get("/devis/:id", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
