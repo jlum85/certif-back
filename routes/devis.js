@@ -110,6 +110,7 @@ router.post("/devis/create", async (req, res) => {
     res.status(400).json({ message: "Missing or Wrong Parameter" });
     return;
   }
+
   try {
     const newDevis = new Devis({
       mail,
@@ -123,11 +124,13 @@ router.post("/devis/create", async (req, res) => {
       workingAmount,
       notaryFees
     });
+
     newDevis.totalBudget = acquisitionAmount + workingAmount + notaryFees;
     newDevis.dossierNumber = getRandomDossier();
-
     await newDevis.save(); // sauvegarde en base
-    await sendMail(newDevis); // mail de récapitulatif
+
+    // !!!!!!!!  désactivation temporaire du mail
+    //await sendMail(newDevis); // mail de récapitulatif
 
     res.json(newDevis);
   } catch (error) {
