@@ -6,6 +6,7 @@ const cors = require("cors");
 
 const devisRoutes = require("./routes/devis");
 const sendMailRoutes = require("./routes/sendMail");
+const userRoutes = require("./routes/user");
 
 const app = express();
 app.use(bodyParser.json());
@@ -13,6 +14,7 @@ app.use(cors());
 
 app.use(devisRoutes);
 app.use(sendMailRoutes);
+app.use(userRoutes);
 
 mongoose.connect(
   process.env.MONGODB_URI || "mongodb://localhost/meilleurtaux",

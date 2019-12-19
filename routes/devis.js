@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const middlewares = require("./middlewares");
 
 const Devis = require("../models/Devis");
 
@@ -9,7 +10,7 @@ const getRandomDossier = () => {
 };
 
 // POST  /create
-router.post("/devis/create", async (req, res) => {
+router.post("/devis/create", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
   // destructuring pour récupérer les paramètres
@@ -71,7 +72,7 @@ router.post("/devis/create", async (req, res) => {
 });
 
 // POST   /delete
-router.post("/devis/delete/:id", async (req, res) => {
+router.post("/devis/delete/:id", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
   const { id } = req.params;
@@ -94,7 +95,7 @@ router.post("/devis/delete/:id", async (req, res) => {
 });
 
 // GET  Liste des devis
-router.get("/devis", async (req, res) => {
+router.get("/devis", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
   try {
@@ -106,7 +107,7 @@ router.get("/devis", async (req, res) => {
 });
 
 // GET   Sélection d'un devis par son n° de dossier
-router.get("/devis/:id", async (req, res) => {
+router.get("/devis/:id", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
   const { id } = req.params;

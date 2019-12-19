@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const mailgun = require("mailgun-js");
+const middlewares = require("./middlewares");
 
-router.post("/mail/send", async (req, res) => {
+router.post("/mail/send", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
   const { to, subject, dossier } = req.body;
