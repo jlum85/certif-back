@@ -3,6 +3,7 @@ const router = express.Router();
 const middlewares = require("./middlewares");
 const mailgun = require("mailgun-js");
 const Devis = require("../models/Devis");
+const global = require("./global");
 
 const getRandomDossier = () => {
   // génération d'un numéro de dossier sur 8 caractères
@@ -13,30 +14,18 @@ const sendMail = async newDevis => {
   const to = newDevis.mail;
   const subject = "Devis meilleurtaux.com";
 
-  const radioOption1 = ["MAISON", "APPARTEMENT"];
-  const radioOption2 = ["ANCIEN", "NEUF"];
-  const radioOption3 = [
-    "Résidence principale",
-    "Résidence secondaire",
-    "Investissement locatif"
-  ];
-  const radioOption4 = [
-    "Locataire",
-    "Propriétaire",
-    "Bénéficiaire d'un logement de fonction",
-    "Hébergé à titre gratuit"
-  ];
-
   const text = ` Bonjour
 
   Votre devis ${newDevis.dossierNumber} a bien été enregistré.
 
   Récapitulatif de la demande : 
-  - Type de bien : ${radioOption1[newDevis.propertyType]}
-  - Etat du bien : ${radioOption2[newDevis.propertyState]}
-  - Usage du bien : ${radioOption3[newDevis.propertyUse]}
+  - Type de bien : ${global.tabType[newDevis.propertyType]}
+  - Etat du bien : ${global.tabState[newDevis.propertyState]}
+  - Usage du bien : ${global.tabUsage[newDevis.propertyUse]}
 
-  - Votre situation actuelle : ${radioOption4[newDevis.propertySituation]}
+  - Votre situation actuelle : ${
+    global.tabSituation[newDevis.propertySituation]
+  }
 
   Localisation du bien à financer : 
   - Pays : ${newDevis.country}
