@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const middlewares = require("./middlewares");
 const mailgun = require("mailgun-js");
 
-router.post("/mail/send", async (req, res) => {
+// route uniquement pour tester mailgun, A SUPPRIMER !!
+router.post("/mail/send", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
   const { to, subject, dossier } = req.body;
@@ -11,7 +13,7 @@ router.post("/mail/send", async (req, res) => {
     return;
   }
 
-  // construction du message du mail avec un template litteral pour une version ligth
+  // construction du message du mail avec un template litteral pour une version ligth en test
   const text = `Bonjour
 
 Votre devis ${dossier} a bien été enregistré.

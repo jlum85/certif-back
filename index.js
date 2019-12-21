@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const devisRoutes = require("./routes/devis");
-const sendMailRoutes = require("./routes/sendMail");
 const userRoutes = require("./routes/user");
 
 const app = express();
@@ -13,13 +12,16 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use(devisRoutes);
-app.use(sendMailRoutes);
 app.use(userRoutes);
 
 mongoose.connect(
   process.env.MONGODB_URI || "mongodb://localhost/meilleurtaux",
   { useNewUrlParser: true, useUnifiedTopology: true }
 );
+
+app.get("/", function(req, res) {
+  return res.send("welcome to certif react from the reacteur / ");
+});
 
 app.all("*", (req, res) => {
   res.status(404).send("Page introuvable");
