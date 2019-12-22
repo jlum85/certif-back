@@ -10,6 +10,7 @@ const getRandomDossier = () => {
   return Math.floor(Math.random() * 100000000);
 };
 
+// envoi du mail récapitulatif
 const sendMail = async newDevis => {
   const to = newDevis.mail;
   const subject = "Devis meilleurtaux.com";
@@ -112,7 +113,7 @@ router.post("/devis/create", async (req, res) => {
     !mail ||
     !tabOption1.includes(propertyType) || // les seules valeurs valides pour propertyType sont dans tabOption1
     !tabOption1.includes(propertyState) ||
-    !tabOption2.includes(propertyUse) ||
+    !tabOption2.includes(propertyUse) || // les seules valeurs valides pour propertyUse sont dans tabOption2
     !tabOption2.includes(propertySituation) ||
     !country ||
     !city ||
@@ -136,6 +137,7 @@ router.post("/devis/create", async (req, res) => {
       workingAmount
     });
 
+    // calcul des frais de notaires
     const notaryFees = getNotaryFees(acquisitionAmount, propertyState);
     newDevis.notaryFees = notaryFees;
     newDevis.totalBudget =
@@ -190,7 +192,6 @@ router.get("/devis", middlewares.authenticate, async (req, res) => {
 router.post("/devis/budget", async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
-  // destructuring pour récupérer les paramètres
   const { acquisitionAmount, workingAmount, propertyState } = req.body;
 
   // contrôles des éléments nécessaires au calcul

@@ -3,7 +3,7 @@ const router = express.Router();
 const middlewares = require("./middlewares");
 const mailgun = require("mailgun-js");
 
-// route uniquement pour tester mailgun, A SUPPRIMER !!
+// route uniquement pour tester mailgun
 router.post("/mail/send", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
