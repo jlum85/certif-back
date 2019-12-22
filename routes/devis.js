@@ -162,6 +162,67 @@ router.get("/devis", middlewares.authenticate, async (req, res) => {
   }
 });
 
+// GET calcul des frais de notaire et du total budget
+router.get("/devis/budget", async (req, res) => {
+  console.log(">> Method : " + req.method + " , Route : " + req.route.path);
+
+  // destructuring pour récupérer les paramètres
+  const { acquisitionAmount, workingAmount, propertyState } = req.body;
+
+  // contrôles des éléments nécessaires au calcul
+  if (
+    !acquisitionAmount ||
+    acquisitionAmount <= 0 ||
+    (propertyState !== 0 && propertyState !== 1)
+  ) {
+    res.status(400).json({ message: "Missing or Invalid Parameter" });
+    return;
+  }
+  let works = 0; // le montant des travaux  n'est pas obligatoire
+  if (workingAmount && workingAmount >= 0) {
+    works = workingAmount;
+  }
+
+  try {
+    // conversion montant formaté en nombre
+    const castToNum = value => {
+      if (value && typeof value === "string") {
+        return parseInt(value.replace(/\D/g, "")); // on enlève tous les caractères non numériques
+      } else if (value && typeof value === "number") {
+        return value;
+      } else {
+        return 0;
+      }
+    };
+
+    // calcul des frais de notaire
+    const getNotaryFees = acquisitionFee => {
+      const value = castToNum(acquisitionFee);
+      if (value > 0) {
+        // un taux de 1,80% sur le prix de l'achat, pour un bien neuf : radioState = 1
+        // un taux de 7,38% sur le prix de l'achat, pour un bien ancien :radioState= 0
+        if (propertyState === 1) {
+          return Math.round((value * 1.8) / 100);
+        } else {
+          return Math.round((value * 7.38) / 100);
+        }
+      }
+      return 0;
+    };
+
+    const notaryFees = getNotaryFees(acquisitionAmount);
+
+    // calcul du total budget
+    const totalBudget = Math.round(
+      castToNum(acquisitionAmount) + castToNum(works) + notaryFees
+    );
+
+    res.json({ notaryFees: notaryFees, totalBudget: totalBudget });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 // GET   Sélection d'un devis par son n° de dossier , on utilise un midddleware car seul l'admin peut consulter
 router.get("/devis/:id", middlewares.authenticate, async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
