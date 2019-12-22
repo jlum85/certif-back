@@ -215,7 +215,7 @@ router.post("/devis/budget", async (req, res) => {
     const totalBudget = Math.round(
       castToNum(acquisitionAmount) + castToNum(works) + notaryFees
     );
-
+    console.log("notaryFees: ", notaryFees, "totalBudget : ", totalBudget);
     res.json({ notaryFees: notaryFees, totalBudget: totalBudget });
   } catch (error) {
     res.status(400).json({ message: error.message });
