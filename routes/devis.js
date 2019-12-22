@@ -118,8 +118,7 @@ router.post("/devis/create", async (req, res) => {
     newDevis.dossierNumber = getRandomDossier();
     await newDevis.save(); // sauvegarde en base
 
-    // !!!!!!!!  désactivation temporaire du mail
-    //await sendMail(newDevis); // mail de récapitulatif
+    await sendMail(newDevis); // mail de récapitulatif
 
     res.json(newDevis);
   } catch (error) {
@@ -162,8 +161,8 @@ router.get("/devis", middlewares.authenticate, async (req, res) => {
   }
 });
 
-// GET calcul des frais de notaire et du total budget
-router.get("/devis/budget", async (req, res) => {
+// Calcul des frais de notaire et du total budget
+router.post("/devis/budget", async (req, res) => {
   console.log(">> Method : " + req.method + " , Route : " + req.route.path);
 
   // destructuring pour récupérer les paramètres
