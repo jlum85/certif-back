@@ -2,7 +2,7 @@
 
 Reproduction d'un formulaire de demande de devis pour un emprunt immobilier sur MeilleurTaux.com
 
-![Gif demo](src/demo/certif-react.gif)
+![Gif demo](./demo/certif-react.gif)
 
 ## Liste des routes
 
