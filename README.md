@@ -1,5 +1,7 @@
 # Backend Certif React
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/a9409782-01f8-4e15-93a5-6cef16970804/deploy-status)](https://app.netlify.com/sites/jl-meilleurtaux/deploys)
+
 Reproduction d'un formulaire de demande de devis pour un emprunt immobilier sur MeilleurTaux.com
 
 ![Gif demo](./demo/certif-react.gif)
